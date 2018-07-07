@@ -64,8 +64,8 @@ export default {
     return {
       terms: [],
       schoolYears: [],
-      selectedSchoolYear: -1,
-      selectedTerm: -1,
+      selectedSchoolYear: '',
+      selectedTerm: '',
       isCurrent: false,
       termInfo: {},
       search: false,
@@ -86,10 +86,12 @@ export default {
               throw new Error('get current year error')
             } else if (currentTerm.length === 1) {
               this.selectedTerm = currentTerm[0].id
+              this.isCurrent = true
             } else {
               this.selectedTerm = data[0].id
+              this.isCurrent = false
             }
-            this.isCurrent = this.selectedTerm.isCurrent
+
             this.termInfo.schoolYear = this.selectedSchoolYear
             this.termInfo.termId = this.selectedTerm
             this.termInfo.isCurrent = this.isCurrent

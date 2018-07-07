@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const eduadmin = '/eduadmin/api'
+const schoolId = 3
 export default {
   // GET请求
   getSchoolYear (schoolId) {
@@ -38,7 +39,7 @@ export default {
   // 获取选课的基础设置
   getBaseSetting (termId) {
     // return axios.get(`/backend/baseSetting/optionalSetting/${termId}`)
-    return axios.get(`/backend/baseSetting/optionalSetting`)
+    return axios.get(`${eduadmin}/ocBaseSet/selectOne?schoolId=${schoolId}&termId=${termId}`)
   },
   getClassStudents (classId) {
     // return axios.get(`/backend/baseSetting/optionalSetting/${termId}`)
@@ -58,7 +59,7 @@ export default {
     return axios.put(`${eduadmin}/ocDomain/uptName?id=${domain.id}&domainName=${domain.domainName}`)
   },
   updateBaseSetting (optionalSetting) {
-    return axios.put(`/backend/baseSetting/optionalSetting`, optionalSetting)
+    return axios.post(`${eduadmin}/ocBaseSet/save`, optionalSetting)
   },
 
   // 删除请求

@@ -5,77 +5,102 @@
       <div class="right-menu" >
         <el-select @change="selectYear" v-model="selectedSchoolYear">
           <el-option v-for="(item, index) in schoolYears"
-          :key="index" :label="item.name" :value="item.id"/>
+          :key="index" :label="item.schoolYear" :value="item.id"/>
         </el-select>
         <el-select style="margin-left:20px;" @change="selectTerm" v-model="selectedTerm">
           <el-option v-for="(item, index) in terms"
-          :key="index" :label="item.name" :value="item.id"/>
+          :key="index" :label="item.termName" :value="item.id"/>
         </el-select>
       </div>
     </div>
     <div style="width:50%;margin:auto;margin-top:80px;
     border:1px solid #F0F0F0;padding: 60px;">
-      <el-form :model="baseSetting" label-width="120px" style="width:40%;margin:auto;" :disabled="disabled">
+      <el-form :model="baseSetting" label-width="120px" style="width:40%;margin:auto;" :disabled="!isCurrent">
         <el-form-item required label="选课开始时间" style="margin-bottom:30px;">
-          <el-date-picker type="date" placeholder="选择日期" v-model="baseSetting.startDate" style="width: 100%;"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd HH:mm:ss" v-model="baseSetting.startDate" style="width: 100%;"></el-date-picker>
         </el-form-item>
         <el-form-item required label="选课结束时间" style="margin-bottom:30px;">
-          <el-date-picker type="date" placeholder="选择日期" v-model="baseSetting.endDate" style="width: 100%;"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd HH:mm:ss" v-model="baseSetting.endDate" style="width: 100%;"></el-date-picker>
         </el-form-item>
         <el-form-item required label="课程课时（周）" style="margin-bottom:30px;">
-          <el-input class="round-input" placeholder="请输入课程课时（周）" v-model="baseSetting.weeks"/>
+          <el-input class="round-input" type="number" placeholder="请输入课程课时（周）" v-model="baseSetting.defaultWeekNum"/>
         </el-form-item>
         <el-form-item required label="每人可退选次数" style="margin-bottom:30px;">
-          <el-input class="round-input" placeholder="请输入每人可退选次数" v-model="baseSetting.cancelTimes"/>
+          <el-input class="round-input" type="number" placeholder="请输入每人可退选次数" v-model="baseSetting.outNum"/>
         </el-form-item>
         <el-form-item required label="每人限选课程数" style="margin-bottom:0;">
-          <el-input  class="round-input" placeholder="请输入每人限选课程数" v-model="baseSetting.limitTimes"/>
+          <el-input  class="round-input" type="number" placeholder="请输入每人限选课程数" v-model="baseSetting.limitNum"/>
         </el-form-item>
       </el-form>
     </div>
     <div class="footer">
-      <el-button :disabled="disabled" type="primary" class="OK-button" round  @click="OK">确定</el-button>
-      <el-button :disabled="disabled" class="Cancel-button" round @click="cancel">取消</el-button>
+      <el-button :disabled="!isCurrent" type="primary" class="OK-button" round  @click="OK">确定</el-button>
+      <el-button :disabled="!isCurrent" class="Cancel-button" round @click="cancel">取消</el-button>
     </div>
   </div>
 </template>
 
 <script>
 import baseService from '../service/baseService.js'
-import {deleteCallback} from '../common/CommonCallback.js'
+import {updateCallback} from '../common/CommonCallback.js'
 export default {
   data () {
     return {
       terms: [],
       schoolYears: [],
-      selectedSchoolYear: -1,
-      selectedTerm: -1,
+      selectedSchoolYear: '',
+      selectedTerm: '',
       baseSetting: {},
-      disabled: false
+      isCurrent: false
+    }
+  },
+  watch: {
+    selectedSchoolYear (newVal, oldVal) {
+      baseService.getTermBySchooYear(newVal)
+        .then(({data}) => {
+          data = data.data
+          this.terms = data
+          if (data.length > 0) {
+            const currentTerm = data.filter(element => {
+              return element.isCurrent
+            })
+            if (currentTerm.length > 1) {
+              throw new Error('get current year error')
+            } else if (currentTerm.length === 1) {
+              this.selectedTerm = currentTerm[0].id
+              this.isCurrent = currentTerm[0].isCurrent
+            } else {
+              this.selectedTerm = data[0].id
+              this.isCurrent = false
+            }
+            this.getBaseSetting(this.selectedTerm)
+          }
+        })
     }
   },
   methods: {
     selectYear (id) {
-      this.terms = this.schoolYears[id].terms
       this.selectedTerm = this.terms[0].id
-      this.disabled = !this.terms[0].isCurrent
     },
     selectTerm (id) {
       const term = this.terms.find(element => {
         return element.id === id
       })
-      this.disabled = !term.isCurrent
+      this.isCurrent = term.isCurrent
     },
     getSchoolYear () {
       baseService.getSchoolYear()
         .then(({data}) => {
+          data = data.data
           this.schoolYears = data
           if (data.length > 0) {
-            this.selectedSchoolYear = data[0].id
-            this.terms = data[0].terms
-            this.selectedTerm = this.terms.length > 0 ? this.terms[0].id : {}
-            this.disabled = !this.terms[0].isCurrent
-            this.getBaseSetting(this.selectedTerm)
+            const currentYear = data.filter(element => {
+              return element.isCurrent
+            })
+            if (currentYear.length !== 1) {
+              throw new Error('get current year error')
+            }
+            this.selectedSchoolYear = currentYear[0].id
           }
         })
     },
@@ -83,14 +108,33 @@ export default {
       baseService.getBaseSetting(termId)
         .then(({data}) => {
           this.baseSetting = data
+          // 如果没有设定基本信息，则先生成一条默认的基本信息
+          if (!this.baseSetting) {
+            this.baseSetting = {schoolId: 3, termId}
+            this.OK(true)
+          }
         })
     },
-    OK () {
+    OK (isNew = false) {
+      this.baseSetting.defaultWeekNum = parseInt(this.baseSetting.defaultWeekNum)
+      this.baseSetting.limitNum = parseInt(this.baseSetting.limitNum)
+      this.baseSetting.outNum = parseInt(this.baseSetting.outNum)
       baseService.updateBaseSetting(this.baseSetting)
-        .then(deleteCallback.success.bind(this))
-        .catch(deleteCallback.fail.bind(this))
+        .then(({data}) => {
+          if (!isNew) {
+            if (data.code === 0) {
+              updateCallback.success.call(this, '更新设置成功!')
+            } else {
+              updateCallback.fail.call(this, `更新设置失败!原因：${data.msg}`)
+            }
+          }
+        })
+        .catch(({data}) => {
+          updateCallback.fail.call(this, '更新设置失败！')
+        })
     },
     cancel () {
+      // 重置将获取先前的设置
       this.getBaseSetting(this.selectedTerm)
     }
   },

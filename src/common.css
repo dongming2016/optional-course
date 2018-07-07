@@ -1,0 +1,78 @@
+/* 星标 */
+.red-star {
+  color: red;
+  vertical-align:sub;
+}
+
+/* 表格样式 */
+.digital-table,
+.digital-table .el-table th {
+  text-align: center;
+}
+
+/* 弹框样式 */
+.dialog-box-content {
+  text-align: center;
+}
+.dialog-box-content .el-form-item__label {
+  float: none;
+  display: inline-block;
+}
+.dialog-box-content .el-form-item__content {
+  display: inline-block;
+  margin-left: 0 !important;
+}
+.dialog-box-content .el-form--inline .el-form-item__content {
+  width: 200px;
+  text-align: left;
+}
+/* 按钮样式 */
+.table-button {
+  display: inline-block;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  line-height: 25px;
+
+}
+.table-edit-button {
+  border:1px solid #FEA96D;
+  color: #FEA96D;
+}
+.table-delete-button {
+  border:1px solid #66E1D3;
+  color: #66E1D3;
+}
+.el-table--enable-row-hover .el-table__body tr:hover>td .table-edit-button {
+  background: #FEA96D;
+  color: #fff;
+}
+.el-table--enable-row-hover .el-table__body tr:hover>td .table-delete-button {
+  background: #66E1D3;
+  color: #fff;
+}
+.dialog-footer {
+  margin-top: 40px;
+  text-align: center;
+}
+.dialog-footer .el-button--primary {
+  background: #3DD9C4;
+  border-color: #3DD9C4;
+  box-shadow: 4px 4px 2px #e7e7e7;
+  width: 100px;
+  border-radius: 20px;
+}
+.dialog-footer .dialog-cancel {
+  width: 100px;
+  border-radius: 20px;
+}
+.el-dialog__header {
+  border-bottom: 1px solid #F3F3F3;
+}
+.el-dialog__body {
+  padding-top: 40px;
+}
+.delete-dialog .el-dialog {
+  width: 500px;
+}

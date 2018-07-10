@@ -3,7 +3,7 @@
     <el-input class="round-input" placeholder="请输入上课时间"
     @focus="showTime=true" v-model="timeStr"/>
       <div class="select-time" style="width:230px;" v-show="showTime">
-        <clock @setTime="setTime"/>
+        <clock @setTime="setTime" :width="width"/>
         <div class="button-container" style="margin-right:15px;">
           <el-button type="text" class="OK" @click="OK">确定</el-button>
           <el-button type="text" class="Cancel" @click="Cancel">取消</el-button>
@@ -25,6 +25,11 @@ export default {
         return {
           timeStr: ''
         }
+      }
+    },
+    width: {
+      default () {
+        return 200
       }
     }
   },

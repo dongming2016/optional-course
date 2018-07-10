@@ -9,33 +9,36 @@
       <el-form inline :model="classroomDatas" label-width="180px">
         <el-form-item required  label="课程编号:">
           <span v-if="!isCreate">{{classroomDatas.courseCode}}</span>
-          <el-input v-else class="round-input" placeholder="请输入课程编号" v-model="classroomDatas.courseCode"/>
+          <el-input v-else class="round-input" @blur="getCourseInfo({courseCode:classroomDatas.courseCode})" placeholder="请输入课程编号" v-model="classroomDatas.courseCode"/>
         </el-form-item>
         <el-form-item required  label="课程名称:">
            <span v-if="!isCreate">{{classroomDatas.courseName}}</span>
-          <el-input v-else class="round-input" placeholder="请输入课程名称" v-model="classroomDatas.courseName"/>
+          <el-input v-else class="round-input" @blur="getCourseInfo({courseName:classroomDatas.courseName})" placeholder="请输入课程名称" v-model="classroomDatas.courseName"/>
         </el-form-item>
         <el-form-item required  label="课程类别:">
           <span v-if="!isCreate">{{classroomDatas.typeName}}</span>
-          <el-select v-else disabled class="round-input" v-model="classroomDatas.typeId">
+          <el-input v-else disabled class="round-input" v-model="classroomDatas.typeName"/>
+          <!-- <el-select v-else disabled class="round-input" v-model="classroomDatas.typeId">
             <el-option v-for="(item, index) in categories"
             :key="index" :label="item.typeName" :value="item.id"/>
-          </el-select>
+          </el-select> -->
         </el-form-item>
         <el-form-item required  label="学科名称:">
-          <span v-if="!isCreate">{{classroomDatas.subject}}</span>
-          <el-select v-else disabled class="round-input" v-model="classroomDatas.subjectId" placeholder="请输入学科名称">
+          <span v-if="!isCreate">{{classroomDatas.subjectName}}</span>
+          <el-input v-else disabled class="round-input" v-model="classroomDatas.subjectName"/>
+          <!-- <el-select v-else disabled class="round-input" v-model="classroomDatas.subjectId" placeholder="请输入学科名称">
             <el-option v-for="(item, index) in subjects"
             :key="index" :label="item.name" :value="item.id"/>
-          </el-select>
+          </el-select> -->
         </el-form-item>
         <el-form-item required  label="课程所属领域:">
           <span v-if="!isCreate">{{classroomDatas.domainName}}</span>
-          <el-select v-else disabled class="round-input" v-model="classroomDatas.domainId"
+           <el-input v-else disabled class="round-input" v-model="classroomDatas.domainName"/>
+          <!-- <el-select v-else disabled class="round-input" v-model="classroomDatas.domainId"
           placeholder="请输入所属领域">
             <el-option v-for="(item, index) in domains"
             :key="index" :label="item.domainName" :value="item.id"/>
-          </el-select>
+          </el-select> -->
         </el-form-item>
         <el-form-item required  label="任课老师:">
           <span v-if="!isEditable">{{classroomDatas.teacherName}}</span>
@@ -48,7 +51,7 @@
           <span v-if="!isEditable">{{classroomDatas.timeStr}}</span>
           <el-input v-else class="round-input" @focus="showTime=true" v-model="classroomDatas.timeStr"/>
           <div class="select-time" v-show="showTime">
-            <clock @setTime="setTime"/>
+            <clock @setTime="setTime" :width="260"/>
             <div class="button-container">
               <el-button type="text" class="OK" @click="OK">确定</el-button>
               <el-button type="text" class="Cancel" @click="Cancel">取消</el-button>
@@ -154,6 +157,21 @@ export default {
     }
   },
   methods: {
+    getCourseInfo (queryParam) {
+      console.log(queryParam)
+      const query = {currentPage: 1, pageSize: 100}
+      Object.assign(query, queryParam)
+      courseService.getCourse(query)
+        .then(({data}) => {
+          console.log(data.records)
+          if (data.records.length === 1) {
+            console.log(data.records)
+            this.classroomDatas.typeName = data.records[0].typeName
+            this.classroomDatas.subjectName = data.records[0].subjectName
+            this.classroomDatas.domainName = data.records[0].domainName
+          }
+        })
+    },
     classroomOK () {
       if (!this.isEditable) {
         this.$emit('editInvisible')

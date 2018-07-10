@@ -8,7 +8,7 @@
       {{item | localeWeekDay(firstDay, local)}}</div></div>
       <div @click="changeActiveIndex(1)" :class="{'inactive': activeIndex>=7}" class="next-day">&gt;</div>
     </div>
-    <canvas width="200" height="200" ref="myClock"
+    <canvas :width="width" :height="height" ref="myClock"
     @click="clickClock">
     <!-- @mousemove="hoverClock" -->
     </canvas>
@@ -29,6 +29,16 @@ export default {
     courseNum: {
       default () {
         return 12
+      }
+    },
+    width: {
+      default () {
+        return 200
+      }
+    },
+    height: {
+      default () {
+        return 200
       }
     },
     selectedTimes: {
@@ -65,7 +75,7 @@ export default {
         // const {labelX, labelY} = this.calcLabelPosition(i, angle)
         const {centerX, centerY} = this.calcCenterPoint(angle)
         this.labels.push(new Label(i, centerX, centerY + 5, centerX,
-          centerY, i, this.ctx, CENTERT_TEXTS[i - 1], isClassActive))
+          centerY, i, this.ctx, CENTERT_TEXTS[i - 1], isClassActive, this.width / 2, this.height / 2))
       }
     },
     hoverClock (event) {
@@ -112,7 +122,7 @@ export default {
     draw () {
       this.ctx.fillStyle = '#F5F5F5'
       this.ctx.beginPath()
-      this.ctx.arc(BIG_CIRCLE_X, BIG_CIRCLE_Y, BIG_CIRCLE_R, 0, 2 * Math.PI)
+      this.ctx.arc(this.width / 2, this.height / 2, BIG_CIRCLE_R, 0, 2 * Math.PI)
       this.ctx.fill()
       this.labels.forEach(element => {
         element.draw()
@@ -122,8 +132,8 @@ export default {
       this.$refs.myClock.height = 200
     },
     calcCenterPoint (angle) {
-      const centerX = (BIG_CIRCLE_R - DELTA * 2) * (1 + Math.sin(angle)) + DELTA * 2
-      const centerY = (BIG_CIRCLE_R - DELTA * 2) * (1 - Math.cos(angle)) + DELTA * 2
+      const centerX = (BIG_CIRCLE_R - DELTA * 2) * (1 + Math.sin(angle)) + DELTA * 2 + this.width / 2 - BIG_CIRCLE_R
+      const centerY = (BIG_CIRCLE_R - DELTA * 2) * (1 - Math.cos(angle)) + DELTA * 2 + this.height / 2 - BIG_CIRCLE_R
 
       return { centerX, centerY }
     }

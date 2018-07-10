@@ -14,7 +14,7 @@ export default class Label {
    * @param {canvas} ctx
    */
   constructor (id, labelX, labelY, centerX, centerY,
-    text, ctx, centerText, selected, R = r) {
+    text, ctx, centerText, selected, outerX = 100, outerY = 100, R = r) {
     this.id = id
     this.labelX = labelX
     this.labelY = labelY
@@ -27,6 +27,8 @@ export default class Label {
     this.r = R
     this.clicked = false
     this.hovered = false
+    this.outerX = outerX
+    this.outerY = outerY
   }
 
   draw () {
@@ -61,7 +63,7 @@ export default class Label {
       this.ctx.fillStyle = 'red'
       this.ctx.textAlign = 'center'
       this.ctx.font = '20px Georgia bold'
-      this.ctx.fillText(this.centerText, 100, 110)
+      this.ctx.fillText(this.centerText, this.outerX, this.outerY)
     }
   }
 

@@ -36,7 +36,7 @@ export default {
       isUpdate: false,
       searchConditions: {
         pageSize: 10,
-        currentPage: 0
+        currentPage: 1
       }
     }
   },
@@ -46,7 +46,7 @@ export default {
       // 当searchConditions为空时，搜索条件为空和pagination
       if (searchConditions) {
         this.searchConditions = searchConditions
-        Object.assign(this.searchConditions, {pageSize: 10, currentPage: 0})
+        Object.assign(this.searchConditions, {pageSize: 10, currentPage: 1})
       } else {
         Object.assign(this.searchConditions, pagination)
       }

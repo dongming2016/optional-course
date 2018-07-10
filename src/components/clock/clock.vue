@@ -28,7 +28,7 @@ export default {
   props: {
     courseNum: {
       default () {
-        return 8
+        return 12
       }
     },
     selectedTimes: {
@@ -129,6 +129,10 @@ export default {
     }
   },
   mounted () {
+    this.init()
+    this.draw()
+  },
+  updated () {
     this.init()
     this.draw()
   },

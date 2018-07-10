@@ -17,12 +17,12 @@ export default {
     return axios.get(`${eduadmin}/ocDomain/selectAll?schoolId=${schoolId}`)
   },
   getSubject () {
-    return axios.get('/backend/baseSetting/subjects')
+    return axios.get(`${eduadmin}/schoolSubject/selectAll?schoolId=${schoolId}`)
   },
   getCategory () {
     const schoolId = 3
     // return axios.get(`/backend/baseSetting/category/${termId}`)
-    return axios.get(`${eduadmin}/ocType/selectAll?schoolId=${schoolId}`)
+    return axios.get(`${eduadmin}/ocType/selectAllDetail?schoolId=${schoolId}`)
   },
   getTeachers () {
     return axios.get(`/backend/baseSetting/teachers`)
@@ -47,8 +47,12 @@ export default {
   },
 
   // PUT请求
-  updateCategory (category) {
+  addCategory (category) {
+    Object.assign(category, {'schoolId': '3'})
     return axios.post(`${eduadmin}/ocType/add`, category)
+  },
+  updateCategory (category) {
+    return axios.put(`${eduadmin}/ocType/uptName`, category)
   },
   addDomain (domain) {
     const schoolId = 3

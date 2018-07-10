@@ -16,25 +16,25 @@
           <el-input v-else class="round-input" placeholder="请输入课程名称" v-model="classroomDatas.courseName"/>
         </el-form-item>
         <el-form-item required  label="课程类别:">
-          <span v-if="!isCreate">{{classroomDatas.category}}</span>
-          <el-select v-else disabled class="round-input" v-model="classroomDatas.category">
+          <span v-if="!isCreate">{{classroomDatas.typeName}}</span>
+          <el-select v-else disabled class="round-input" v-model="classroomDatas.typeId">
             <el-option v-for="(item, index) in categories"
-            :key="index" :label="item.name" :value="item.id"/>
+            :key="index" :label="item.typeName" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item required  label="学科名称:">
           <span v-if="!isCreate">{{classroomDatas.subject}}</span>
-          <el-select v-else disabled class="round-input" v-model="classroomDatas.subject" placeholder="请输入学科名称">
+          <el-select v-else disabled class="round-input" v-model="classroomDatas.subjectId" placeholder="请输入学科名称">
             <el-option v-for="(item, index) in subjects"
             :key="index" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item required  label="课程所属领域:">
-          <span v-if="!isCreate">{{classroomDatas.courseDomain && classroomDatas.courseDomain.name}}</span>
-          <el-select v-else disabled class="round-input" v-model="classroomDatas.courseDomain.name"
+          <span v-if="!isCreate">{{classroomDatas.domainName}}</span>
+          <el-select v-else disabled class="round-input" v-model="classroomDatas.domainId"
           placeholder="请输入所属领域">
             <el-option v-for="(item, index) in domains"
-            :key="index" :label="item.name" :value="item.id"/>
+            :key="index" :label="item.domainName" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item required  label="任课老师:">

@@ -8,30 +8,30 @@
         <el-input class="round-input" placeholder="请输入课程名称" v-model="searchConditions.courseName"/>
       </el-form-item>
       <el-form-item class="search-item" label="课程类别">
-        <el-select class="round-input" v-model="searchConditions.category">
+        <el-select class="round-input" v-model="searchConditions.typeId">
           <el-option v-for="(item, index) in categories"
-          :key="index" :label="item.name" :value="item.id"/>
+          :key="index" :label="item.typeName" :value="item.id"/>
         </el-select>
       </el-form-item>
       <el-form-item class="search-item" label="学科名称">
-        <el-select class="round-input" v-model="searchConditions.subject" placeholder="请输入学科名称">
+        <el-select class="round-input" v-model="searchConditions.subjectId" placeholder="请输入学科名称">
           <el-option v-for="(item, index) in subjects"
-          :key="index" :label="item.name" :value="item.id"/>
+          :key="index" :label="item.subjectName" :value="item.id"/>
         </el-select>
       </el-form-item>
       <el-form-item class="search-item" label="课程所属领域">
-        <el-select class="round-input" v-model="searchConditions.courseDomain"
+        <el-select class="round-input" v-model="searchConditions.domainId"
         placeholder="请输入所属领域">
           <el-option v-for="(item, index) in domains"
-          :key="index" :label="item.name" :value="item.id"/>
+          :key="index" :label="item.domainName" :value="item.id"/>
         </el-select>
       </el-form-item>
-      <el-form-item class="search-item" label="考核方式">
+      <!-- <el-form-item class="search-item" label="考核方式">
         <el-select class="round-input" v-model="searchConditions.testMethod" placeholder="请输入考核方式">
           <el-option v-for="(item, index) in methods"
           :key="index" :label="item.name" :value="item.id"/>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
   </div>
 </template>

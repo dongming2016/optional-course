@@ -96,7 +96,7 @@ export default {
     },
     editCallback () {
       this.editDialogVisible = false
-      const pagination = {pageSize: 10, currentPage: 0}
+      const pagination = {pageSize: 10, currentPage: 1}
       this.$emit('dataChanged', {pagination})
     },
     rowStyle ({row, rowIndex}) {
@@ -112,7 +112,7 @@ export default {
       courseService.removeStudent(classroomId, id).then(() => {
         deleteCallback.success.call(this)
         const size = this.pageSize
-        const pagination = {pageSize: size, currentPage: 0}
+        const pagination = {pageSize: size, currentPage: 1}
         this.$emit('dataChanged', {pagination})
         this.tableData.datas = this.tableData.datas.filter(element => {
           return element.id !== id
@@ -129,7 +129,7 @@ export default {
     },
     sizeChange (size) {
       this.pageSize = size
-      const pagination = {pageSize: size, currentPage: 0}
+      const pagination = {pageSize: size, currentPage: 1}
       this.$emit('dataChanged', {pagination})
     },
     pageNoChange (pageNO) {

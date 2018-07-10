@@ -3,7 +3,7 @@
     <div class="title">
       选课基础设置
       <div class="right-menu" >
-        <el-select @change="selectYear" v-model="selectedSchoolYear">
+        <el-select v-model="selectedSchoolYear">
           <el-option v-for="(item, index) in schoolYears"
           :key="index" :label="item.schoolYear" :value="item.id"/>
         </el-select>
@@ -17,10 +17,11 @@
     border:1px solid #F0F0F0;padding: 60px;">
       <el-form :model="baseSetting" label-width="120px" style="width:40%;margin:auto;" :disabled="!isCurrent">
         <el-form-item required label="选课开始时间" style="margin-bottom:30px;">
-          <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd HH:mm:ss" v-model="baseSetting.startDate" style="width: 100%;"></el-date-picker>
+          <el-date-picker type="datetime" placeholder="选择日期" format="yyyy-MM-dd HH:mm:ss" :picker-options="startPickerOptions"
+          value-format="yyyy-MM-dd HH:mm:ss" v-model="baseSetting.startDate" style="width: 100%;"></el-date-picker>
         </el-form-item>
         <el-form-item required label="选课结束时间" style="margin-bottom:30px;">
-          <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd HH:mm:ss" v-model="baseSetting.endDate" style="width: 100%;"></el-date-picker>
+          <el-date-picker type="datetime" placeholder="选择日期" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" v-model="baseSetting.endDate" style="width: 100%;"></el-date-picker>
         </el-form-item>
         <el-form-item required label="课程课时（周）" style="margin-bottom:30px;">
           <el-input class="round-input" type="number" placeholder="请输入课程课时（周）" v-model="baseSetting.defaultWeekNum"/>
@@ -51,7 +52,12 @@ export default {
       selectedSchoolYear: '',
       selectedTerm: '',
       baseSetting: {},
-      isCurrent: false
+      isCurrent: false,
+      startPickerOptions: {
+        disabledDate (time) {
+          return time.getTime() <= Date.now()
+        }
+      }
     }
   },
   watch: {
@@ -74,6 +80,8 @@ export default {
               this.isCurrent = false
             }
             this.getBaseSetting(this.selectedTerm)
+          } else {
+            throw new Error('no term')
           }
         })
     }
@@ -87,6 +95,10 @@ export default {
         return element.id === id
       })
       this.isCurrent = term.isCurrent
+      this.getBaseSetting(this.selectedTerm)
+    },
+    disabledDate (time) {
+      return time.getTime() < Date.now()
     },
     getSchoolYear () {
       baseService.getSchoolYear()
@@ -105,13 +117,27 @@ export default {
         })
     },
     getBaseSetting (termId) {
+      const isCurrent = this.isCurrent
+      // 将字符串的日期转化为Date对象
+      const transformDate = (baseSetting) => {
+        if (baseSetting.startDate) {
+          baseSetting.startDate = new Date(baseSetting.startDate)
+        }
+        if (baseSetting.endDate) {
+          baseSetting.endDate = new Date(baseSetting.endDate)
+        }
+      }
       baseService.getBaseSetting(termId)
         .then(({data}) => {
           this.baseSetting = data
           // 如果没有设定基本信息，则先生成一条默认的基本信息
           if (!this.baseSetting) {
             this.baseSetting = {schoolId: 3, termId}
-            this.OK(true)
+            if (isCurrent) {
+              this.OK(true)
+            }
+          } else {
+            transformDate(this.baseSetting)
           }
         })
     },

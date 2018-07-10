@@ -20,8 +20,8 @@
        <div v-show="isTimeInvalid" style="color:red;">
           请选择上课时间
         </div>
-       <div class="select-time" v-show="showTime">
-         <clock @setTime="setTime" :selectedTimes="selectedTimes"/>
+       <div class="select-time" v-if="showTime">
+         <clock @setTime="setTime" :selectedTimes="getSelectTime"/>
          <div class="button-container">
            <el-button type="text" class="OK" @click="OK">确定</el-button>
            <el-button type="text" class="Cancel" @click="Cancel">取消</el-button>
@@ -40,11 +40,12 @@ import clock from '../clock/clock'
 import moment from 'moment'
 import { CENTERT_TEXTS } from '../clock/const.js'
 import baseService from '../../service/baseService.js'
+import {updateCallback} from '../../common/CommonCallback.js'
 export default {
   components: {
     clock
   },
-  props: ['category'],
+  props: ['category', 'isNew'],
   data () {
     return {
       showTime: false,
@@ -52,6 +53,14 @@ export default {
       isNameInvalid: false,
       isTimeInvalid: false,
       selectedTimes: {}
+    }
+  },
+  computed: {
+    getSelectTime () {
+      if (this.category.ocTypeTimes) {
+        return this.getSelectedTime(this.category.ocTypeTimes)
+      }
+      return {}
     }
   },
   methods: {
@@ -84,11 +93,43 @@ export default {
       const validate = this.checkValidate()
       if (validate) {
         const category = this.category
-        baseService.updateCategory(category)
+        if (this.isNew) {
+          baseService.addCategory(category)
+            .then(({data}) => {
+              if (data.code === 0) {
+                updateCallback.success.call(this, '添加课程类别成功!')
+              } else {
+                updateCallback.fail.call(this, `添加课程类别失败!原因：${data.msg}`)
+              }
+              this.$emit('getData')
+            })
+            .catch(err => {
+              console.error(err)
+              updateCallback.fail.call(this, `添加课程类别失败!`)
+              this.$emit('getData')
+            })
+        } else {
+          baseService.updateCategory(category)
+            .then(({data}) => {
+              if (data.code === 0) {
+                updateCallback.success.call(this, '更新课程类别成功!')
+              } else {
+                updateCallback.fail.call(this, `更新课程类别失败!原因：${data.msg}`)
+              }
+              this.$emit('getData')
+            })
+            .catch(err => {
+              console.error(err)
+              updateCallback.fail.call(this, `更新课程类别失败!`)
+              this.$emit('getData')
+            })
+        }
+        this.showTime = false
         this.$emit('hideDialog')
       }
     },
     categoryCancel () {
+      this.showTime = false
       this.$emit('hideDialog')
     },
     setTime ({day, time, clicked}) {
@@ -100,22 +141,32 @@ export default {
         })
       }
 
+      const result = this.times.map(element => {
+        return {weekNum: element.day, sectionNum: element.time}
+      })
       let timeStr = ''
       this.times.forEach(element => {
-        timeStr += this.localeWeekDay(element.day, 0) + CENTERT_TEXTS[element.time] + ' '
+        timeStr += this.localeWeekDay(element.day, 0) + CENTERT_TEXTS[element.time - 1] + ' '
       })
+      this.category.ocTypeTimes = result
       this.category.timeStr = timeStr
+    },
+    getSelectedTime (ocTypeTimes) {
+      const selectedTimes = {}
+      ocTypeTimes.forEach(element => {
+        let day = selectedTimes[element.weekNum]
+        if (!day) {
+          day = selectedTimes[element.weekNum] = []
+        }
+        day.push(element.sectionNum)
+        this.times.push({day: element.weekNum, time: element.sectionNum})
+      })
+      return selectedTimes
     }
-  },
-  mounted () {
-    this.category.ocTypeTimes.forEach(element => {
-      let day = this.selectedTimes[element.weekNum]
-      if (!day) {
-        day = this.selectedTimes[element.weekNum] = []
-      }
-      day.push(element.sectionNum + 1)
-    })
   }
+  // beforeMount () {
+  //   this.getSelectTime()
+  // }
 }
 </script>
 

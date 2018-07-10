@@ -2,14 +2,14 @@
   <div>
     <el-form inline :model="searchConditions" label-width="100px">
       <el-form-item class="search-item" label="开课时间">
-        <el-select @change="setYearTime" class="round-input year-input" v-model="selectedYear">
+        <el-select class="round-input year-input" v-model="selectedYear">
           <el-option v-for="(item, index) in schoolYears"
-          :key="index" :label="item.name" :value="item.id">
+          :key="index" :label="item.schoolYear" :value="item.id">
           </el-option>
         </el-select>
         <el-select @change="setTermTime" class="round-input term-input" v-model="selectedTerm" style="width:120px;">
           <el-option v-for="(item, index) in terms"
-          :key="index" :label="item.name" :value="item.id"/>
+          :key="index" :label="item.termName" :value="item.id"/>
         </el-select>
       </el-form-item>
       <el-form-item class="search-item" label="课程编号">
@@ -46,6 +46,34 @@ export default {
       this.searchConditions = {}
       const searchConditions = this.searchConditions
       this.$emit('resetDatas', {searchConditions})
+    },
+    selectedYear (newVal, oldVal) {
+      baseService.getTermBySchooYear(newVal)
+        .then(({data}) => {
+          data = data.data
+          this.terms = data
+          if (data.length > 0) {
+            const currentTerm = data.filter(element => {
+              return element.isCurrent
+            })
+            if (currentTerm.length > 1) {
+              throw new Error('get current year error')
+            } else if (currentTerm.length === 1) {
+              this.selectedTerm = currentTerm[0].id
+              this.isCurrent = true
+            } else {
+              this.selectedTerm = data[0].id
+              this.isCurrent = false
+            }
+            this.searchConditions.termId = this.selectedTerm
+            // if (!this.termInfo) {
+            //   this.termInfo = {}
+            // }
+            // this.termInfo.schoolYear = this.selectedYear
+            // this.termInfo.termId = this.selectedTerm
+            // this.termInfo.isCurrent = this.isCurrent
+          }
+        })
     },
     schoolYears (newVal, oldVal) {
       if (this.schoolYears[this.selectedYear]) {
@@ -93,7 +121,7 @@ export default {
 
 <style>
 .year-input .el-input__inner {
-  width: 150px;
+  width: 140px;
 }
 .term-input .el-input__inner {
   width: 105px;

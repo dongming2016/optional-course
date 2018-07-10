@@ -3,7 +3,7 @@
     <div class="title">
       {{title}}
       <div class="right-menu" v-if="rightMenuSettings.showRight">
-        <el-select @change="selectYear" v-model="selectedSchoolYear">
+        <el-select v-model="selectedSchoolYear">
           <el-option v-for="(item, index) in schoolYears"
           :key="index" :label="item.schoolYear" :value="item.id"/>
         </el-select>

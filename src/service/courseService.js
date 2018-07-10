@@ -1,8 +1,15 @@
 import axios from 'axios'
+const schoolId = 3
+const eduadmin = '/eduadmin/api'
 export const courseService = {
   // get请求
   getCourse (condition) {
-    return axios.post('/backend/optionalCourse/conditional-course', condition)
+    condition.schoolId = 3
+    return axios.get(`${eduadmin}/ocCourseBase/selectPage/${condition.currentPage}/${condition.pageSize}`, {params: condition})
+  },
+  isCourseExist (course) {
+    course.schoolId = 3
+    return axios.get(`${eduadmin}/ocCourseBase/selectExist`, {params: course})
   },
   // 获取课堂信息
   getClassroom (condition) {
@@ -14,7 +21,7 @@ export const courseService = {
   },
 
   deleteCourse (courseId) {
-    return axios.delete(`/backend/optionalCourse/course/${courseId}`)
+    return axios.delete(`${eduadmin}/ocCourseBase/del/${courseId}`)
   },
   deleteClassroom (classroomId) {
     return axios.delete(`/backend/optionalCourse/classroom/${classroomId}`)
@@ -23,8 +30,13 @@ export const courseService = {
     return axios.delete(`/backend/optionalCourse/students/${classroomId}/${studentId}`)
   },
 
+  addCourse (course) {
+    course.schoolId = 3
+    return axios.post(`${eduadmin}/ocCourseBase/add?schoolId=${schoolId}&courseName=${course.courseName}&courseCode=${course.courseCode}&typeId=${course.typeId}&subjectId=${course.subjectId}&domainId=${course.domainId}`)
+  },
+
   updateCourse (course) {
-    return axios.put(`/backend/optionalCourse/course`, course)
+    return axios.put(`${eduadmin}/ocCourseBase/upt`, {}, {params: course})
   },
   updateClassroom (classroom) {
     const formData = classroom.image || new FormData()

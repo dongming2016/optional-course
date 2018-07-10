@@ -22,7 +22,8 @@
     </el-table>
     <div class="optional-base-course">
       <el-dialog :visible.sync="editDialogVisible" :title="dialogTitle">
-        <optional-category-box :category="category" @hideDialog="editDialogVisible=false"/>
+        <optional-category-box :isNew="isNew" :category="category"
+        @getData="getCategory" @hideDialog="editDialogVisible=false"/>
       </el-dialog>
     </div>
     <el-dialog class="delete-dialog" title="删除类别" :visible.sync="dialogVisible">
@@ -58,17 +59,21 @@ export default {
       id: -1,
       selectedTime: {},
       category: {},
-      dialogTitle: ''
+      dialogTitle: '',
+      isNew: false
     }
   },
   methods: {
     addCategory () {
       this.dialogTitle = '添加课程类别'
       this.editDialogVisible = true
+      this.category = {}
+      this.isNew = true
     },
     editCategory (item) {
       this.dialogTitle = '编辑课程类别'
       this.category = item
+      this.isNew = false
       this.editDialogVisible = true
     },
     deleteCategory () {
@@ -87,7 +92,8 @@ export default {
       return localeWeekDay(index, 0)
     },
     getClassStr (index) {
-      return CENTERT_TEXTS[index]
+      // 获取的是index是多少节次便是多少
+      return CENTERT_TEXTS[index - 1]
     },
     getCategory () {
       /**

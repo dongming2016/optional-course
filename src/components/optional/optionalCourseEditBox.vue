@@ -10,30 +10,30 @@
           <el-input class="round-input" placeholder="请输入课程名称" v-model="courseData.courseName"/>
         </el-form-item>
         <el-form-item required  label="课程类别">
-          <el-select class="round-input" v-model="courseData.category">
+          <el-select class="round-input" v-model="courseData.typeId">
             <el-option v-for="(item, index) in categories"
-            :key="index" :label="item.name" :value="item.id"/>
+            :key="index" :label="item.typeName" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item required  label="学科名称">
-          <el-select class="round-input" v-model="courseData.subject" placeholder="请输入学科名称">
+          <el-select class="round-input" v-model="courseData.subjectId" placeholder="请输入学科名称">
             <el-option v-for="(item, index) in subjects"
-            :key="index" :label="item.name" :value="item.id"/>
+            :key="index" :label="item.subjectName" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item required  label="课程所属领域">
-          <el-select class="round-input" v-model="courseData.courseDomain"
+          <el-select class="round-input" v-model="courseData.domainId"
           placeholder="请输入所属领域">
             <el-option v-for="(item, index) in domains"
-            :key="index" :label="item.name" :value="item.id"/>
+            :key="index" :label="item.domainName" :value="item.id"/>
           </el-select>
         </el-form-item>
-        <el-form-item required  label="学分">
+        <!-- <el-form-item required  label="学分">
           <el-input class="round-input" placeholder="请输入学分" v-model="courseData.credit"/>
         </el-form-item>
         <el-form-item required  label="考核方式">
           <el-input class="round-input" placeholder="请输入考核方式" v-model="courseData.testMethod"/>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div class="dilalog-note">
         备注：
@@ -58,13 +58,43 @@ export default {
   },
   methods: {
     courseOK () {
-      const successTips = this.isUpdate ? '更新成功' : '添加成功'
-      const failTips = this.isUpdate ? '更新失败' : '添加失败'
-      courseService.updateCourse(this.courseData)
-        .then(() => {
-          updateCallback.success.call(this, successTips)
+      if (!this.isUpdate) {
+        courseService.isCourseExist(this.courseData).then(({data}) => {
+          if (data.code === 1) {
+            console.log(data.msg)
+          } else {
+            courseService.addCourse(this.courseData)
+              .then(({data}) => {
+                if (data.code === 0) {
+                  updateCallback.success.call(this, '添加成功')
+                } else {
+                  updateCallback.fail.call(this, `添加失败,原因：${data.msg}`)
+                }
+                this.$emit('updateData')
+              })
+              .catch(err => {
+                console.error(err)
+                updateCallback.fail.call(this, '添加失败')
+                this.$emit('updateData')
+              })
+          }
         })
-        .catch(updateCallback.fail.call(this, failTips))
+      } else {
+        courseService.updateCourse(this.courseData)
+          .then(({data}) => {
+            if (data.code === 0) {
+              updateCallback.success.call(this, '更新成功')
+            } else {
+              updateCallback.fail.call(this, `更新失败,${data.msg}`)
+            }
+            this.$emit('updateData')
+          })
+          .catch(err => {
+            console.error(err)
+            updateCallback.fail.call(this, '更新失败')
+            this.$emit('updateData')
+          })
+      }
       this.$emit('editInvisible')
     },
     courseCancel () {

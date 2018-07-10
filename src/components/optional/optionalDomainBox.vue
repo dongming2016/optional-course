@@ -55,12 +55,13 @@ export default {
                 updateCallback.fail.call(this, `添加失败，原因：${data.msg}`)
               } else {
                 updateCallback.success.call(this, '添加成功')
-                this.$emit('getData')
               }
+              this.$emit('getData')
             })
             .catch(err => {
               console.error(err)
               updateCallback.fail.call(this, '添加失败')
+              this.$emit('getData')
             })
         } else {
           baseService.updateDomain(domain)
@@ -69,12 +70,13 @@ export default {
                 updateCallback.fail.call(this, `更新失败，原因：${data.msg}`)
               } else {
                 updateCallback.success.call(this, '更新成功')
-                this.$emit('getData')
               }
+              this.$emit('getData')
             })
             .catch(err => {
               console.error(err)
               updateCallback.fail.call(this, '更新失败')
+              this.$emit('getData')
             })
         }
         this.$emit('hideDialog')

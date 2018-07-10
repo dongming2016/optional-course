@@ -5,10 +5,10 @@
       <router-link to="/optional-course-open-manage">
         <el-button round type="primary">开课管理</el-button>
       </router-link>
-      <pagination :totalNumber="tableData.totalNum" @pageSizeChange="sizeChange"/>
+      <pagination :totalNumber="tableData.total" @pageSizeChange="sizeChange"/>
       <div class="digital-table">
         <el-table style="border-top:1px solid #F4F4F4"
-          :data="tableData.datas" :row-style="rowStyle">
+          :data="tableData.records" :row-style="rowStyle">
           <el-table-column
             label="课程编号"
             sortable
@@ -16,24 +16,22 @@
           <el-table-column
             label="课程名称"
             sortable
-            prop="subject">
+            prop="courseName">
           </el-table-column>
           <el-table-column
           label="所属类别"
           sortable
-          prop="category"/>
+          prop="typeName"/>
           <el-table-column
           label="学科名称"
           sortable
-          prop="subject"/>
+          prop="subjectName"/>
           <el-table-column
           label="课程所属领域"
+           prop="domainName"
           sortable>
-          <template slot-scope="scope">
-            {{scope.row.courseDomain.name}}
-          </template>
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
           label="考核方式"
           prop="testMethod"
           sortable>
@@ -41,7 +39,7 @@
           <el-table-column
             label="学分"
             sortable
-            prop="credit"/>
+            prop="credit"/> -->
           <el-table-column v-if="isEditable"
             label="操作" width="250">
             <template slot-scope="props">
@@ -54,14 +52,14 @@
       <div style="text-align:center;">
         <el-pagination layout="prev, pager, next"
         :current-page="tableData.currentPage" :page-size="pageSize"
-          :total="tableData.totalNum"
+          :total="tableData.total"
           @current-change="pageNoChange"
           ></el-pagination>
       </div>
       <el-dialog :visible.sync="editDialogVisible" :title="editTitle"
       :course="course">
-        <optionalCourseEditBox @editInvisible="editCallback"
-        :courseData="course" :categories="categories"
+        <optionalCourseEditBox @editInvisible="editCallback" @updateData="updateData"
+        :courseData="course" :categories="categories" :isUpdate="isUpdate"
         :subjects="subjects" :domains="domains"/>
       </el-dialog>
       <el-dialog :visible.sync="deleteDialogVisible" title="删除课程">
@@ -99,7 +97,8 @@ export default {
       editDialogVisible: false,
       editTitle: '',
       course: {},
-      pageSize: 10
+      pageSize: 10,
+      isUpdate: false
     }
   },
   methods: {
@@ -107,15 +106,19 @@ export default {
       this.editDialogVisible = true
       this.editTitle = '添加课程'
       this.course = {}
+      this.isUpdate = false
     },
     editCourse (course) {
       this.editDialogVisible = true
       this.editTitle = '编辑课程'
       this.course = course
+      this.isUpdate = true
     },
     editCallback () {
       this.editDialogVisible = false
-      const pagination = {pageSize: 10, currentPage: 0}
+    },
+    updateData () {
+      const pagination = {pageSize: 10, currentPage: 1}
       this.$emit('dataChanged', {pagination})
     },
     rowStyle ({row, rowIndex}) {
@@ -130,7 +133,7 @@ export default {
       courseService.deleteCourse(id).then(() => {
         deleteCallback.success.call(this)
         const size = this.pageSize
-        const pagination = {pageSize: size, currentPage: 0}
+        const pagination = {pageSize: size, currentPage: 1}
         this.$emit('dataChanged', {pagination})
         this.tableData.datas = this.tableData.datas.filter(element => {
           return element.id !== id
@@ -147,7 +150,7 @@ export default {
     },
     sizeChange (size) {
       this.pageSize = size
-      const pagination = {pageSize: size, currentPage: 0}
+      const pagination = {pageSize: size, currentPage: 1}
       this.$emit('dataChanged', {pagination})
     },
     pageNoChange (pageNO) {
